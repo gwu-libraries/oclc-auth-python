@@ -1,0 +1,7 @@
+key = '{clientID}'
+secret = '{secret}'
+principal_id = '{principalID}'
+principal_idns = '{principalIDNS}'
+authenticating_institution_id = '{institutionID}'
+idfile = '{path to file containing ids'
+outfile = '{path to write CSV file to}'
