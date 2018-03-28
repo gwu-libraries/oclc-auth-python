@@ -34,10 +34,8 @@ Running the Code
     * principal_id
     * principal_idns
     * authenticating_institution_id
-
-  and the locations of:
-    * the input file (one clean OCLC id per line - blank lines are okay)
-    * where you want the output CSV file
+    * path to the input file (one clean OCLC id per line - blank lines are okay)
+    * path to where you want the output CSV file
     
 <br><br>
 1. Run from the command line:
