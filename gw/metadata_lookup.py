@@ -99,6 +99,7 @@ if __name__ == "__main__":
 
     idfile = open(config.idfile, 'r')
     outfile = open(config.outfile, 'w')
+    outfile.write('OCLC ID,SUDOC,TITLE,YEAR,FORMAT\n')
     lastid = "0"
     lastbibinfo = {}
     for line in idfile.readlines():
