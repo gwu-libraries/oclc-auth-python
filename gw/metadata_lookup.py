@@ -40,11 +40,36 @@ def biblookup(oclc_id):
                          ('Accept', 'application/atom+json')]
 
     try:
-        # response = opener.open(request_url)
-        # response_body = response.read()
-        response_body = '{}'
+        response = opener.open(request_url)
+        response_body = response.read()
         j = json.loads(response_body)
-        # print json.dumps(j, indent=4, sort_keys=True)
+        record = j['content']['record']
+        # print json.dumps(record, indent=4, sort_keys=True)
+
+        fixedFields = record['fixedFields']
+        variableFields = record['variableFields']
+        bibresult = {'format': '', 'sudoc': '', 'title': '', 'year': ''}
+        for f in fixedFields:
+            if f['tag'] == '008':
+                print("FOUND THE 008")
+                print json.dumps(f, indent=4, sort_keys=True)
+                bibresult['format'] = f['data']
+        for f in variableFields:
+            if f['tag'] == '086':
+                print("Found the 086")
+                print json.dumps(f, indent=4, sort_keys=True)
+                #TODO
+                bibresult['sudoc'] = 'sudoc placeholder'
+            if f['tag'] == '245':
+                print("Found the 245")
+                print json.dumps(f, indent=4, sort_keys=True)
+                #TODO
+                bibresult['title'] = 'title placeholder'
+            if f['tag'] == '260':
+                print("Found the 260")
+                print json.dumps(f, indent=4, sort_keys=True)
+                #TODO
+                bibresult['year'] = 'year placeholder'
 
     except URLError as e:
         response_body = e.read()
@@ -55,7 +80,7 @@ def biblookup(oclc_id):
 
     # TODO: Extract the four fields of interest
     # Put them in a Dictionary
-    return {}
+    return bibresult
 
 
 if __name__ == "__main__":
@@ -89,7 +114,8 @@ if __name__ == "__main__":
                 lastid = oclc_id
                 lastbibinfo = bibinfo
             outfile.write("%s,%s,%s,%s,%s\n" %
-                          (oclc_id, 'A', 'B', 'C', 'D'))
+                          (oclc_id, bibinfo['sudoc'], bibinfo['title'],
+                                    bibinfo['year'], bibinfo['format']))
 
     idfile.close()
     outfile.close()
