@@ -22,6 +22,8 @@ Install the `authliboclc` library:
 
 `python setup.py install`
 
+**Note:**  While the [WorldCat Search API does have a rate limit](https://www.oclc.org/developer/develop/web-services/worldcat-search-api/faqs.en.html), the WorldCat Metadata API does *not* have a rate limit at this time.
+
 
 Running the Code
 ================
