@@ -58,18 +58,17 @@ def biblookup(oclc_id):
             if f['tag'] == '086':
                 print("Found the 086")
                 print json.dumps(f, indent=4, sort_keys=True)
-                #TODO
-                bibresult['sudoc'] = 'sudoc placeholder'
+                bibresult['sudoc'] = f['subfieldItems'][0]['data']
             if f['tag'] == '245':
                 print("Found the 245")
                 print json.dumps(f, indent=4, sort_keys=True)
-                #TODO
-                bibresult['title'] = 'title placeholder'
+                bibresult['title'] = '"' + ' '.join([s['data'] for s in f['subfieldItems']]) + '"'
             if f['tag'] == '260':
                 print("Found the 260")
                 print json.dumps(f, indent=4, sort_keys=True)
-                #TODO
-                bibresult['year'] = 'year placeholder'
+                for s in f['subfieldItems']:
+                    if s['subfieldCode'] == 'c':
+                        bibresult['year'] = s['data']
 
     except URLError as e:
         response_body = e.read()
