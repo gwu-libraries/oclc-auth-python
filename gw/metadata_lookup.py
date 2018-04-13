@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 from authliboclc import wskey, user
+import codecs
 import httplib, urllib2
 import json
 from urllib2 import URLError
@@ -39,8 +40,10 @@ def biblookup(oclc_id):
     opener.addheaders = [('Authorization', authorization_header),
                          ('Accept', 'application/atom+json')]
 
+    bibresult = {'format': '', 'sudoc': '', 'title': '', 'year': '', 'found': False}
     try:
         response = opener.open(request_url)
+        bibresult['found'] = True
         response_body = response.read()
         j = json.loads(response_body)
         record = j['content']['record']
@@ -48,12 +51,6 @@ def biblookup(oclc_id):
 
         fixedFields = record['fixedFields']
         variableFields = record['variableFields']
-        bibresult = {'format': '', 'sudoc': '', 'title': '', 'year': ''}
-        for f in fixedFields:
-            if f['tag'] == '008':
-                print("FOUND THE 008")
-                print json.dumps(f, indent=4, sort_keys=True)
-                bibresult['format'] = f['data']
         for f in variableFields:
             if f['tag'] == '086':
                 print("Found the 086")
@@ -62,23 +59,36 @@ def biblookup(oclc_id):
             if f['tag'] == '245':
                 print("Found the 245")
                 print json.dumps(f, indent=4, sort_keys=True)
-                bibresult['title'] = '"' + ' '.join([s['data'] for s in f['subfieldItems']]) + '"'
+                bibresult['title'] = ' '.join([s['data'] for s in f['subfieldItems']])
             if f['tag'] == '260':
                 print("Found the 260")
                 print json.dumps(f, indent=4, sort_keys=True)
                 for s in f['subfieldItems']:
                     if s['subfieldCode'] == 'c':
-                        bibresult['year'] = s['data']
+                        bibresult['year260'] = s['data']
+        for f in fixedFields:
+            if f['tag'] == '008':
+                print("FOUND THE 008")
+                print json.dumps(f, indent=4, sort_keys=True)
+                bibresult['format'] = f['data'].encode('ascii', 'ignore').decode('ascii')
+                for e in f['fixedElements']:
+                    if e['label'] == 'date1':
+                        bibresult['year008'] = e['data']
+        if 'year260' in bibresult and 'year008' in bibresult:
+            # prefer the 008
+            bibresult['year'] = bibresult['year008']
+        else:
+            bibresult['year'] = (bibresult['year260'] if 'year260' in bibresult else "") + \
+                                (bibresult['year008'] if 'year008' in bibresult else "")
 
     except URLError as e:
         response_body = e.read()
+        print "Response Code = %i" %  e.code
         print response_body
         if config.key == '{clientID}':
             print('\n** Note: Edit the script and supply \
                   valid authentication parameters. **\n')
 
-    # TODO: Extract the four fields of interest
-    # Put them in a Dictionary
     return bibresult
 
 
@@ -97,7 +107,7 @@ if __name__ == "__main__":
     )
 
     idfile = open(config.idfile, 'r')
-    outfile = open(config.outfile, 'w')
+    outfile = codecs.open(config.outfile, 'w', 'utf-8')
     outfile.write('OCLC ID,SUDOC,TITLE,YEAR,FORMAT\n')
     lastid = "0"
     lastbibinfo = {}
@@ -113,9 +123,13 @@ if __name__ == "__main__":
                 bibinfo = biblookup(oclc_id)
                 lastid = oclc_id
                 lastbibinfo = bibinfo
-            outfile.write("%s,%s,%s,%s,%s\n" %
-                          (oclc_id, bibinfo['sudoc'], bibinfo['title'],
-                                    bibinfo['year'], bibinfo['format']))
+            if bibinfo['found'] is True:
+                outfile.write('"' + oclc_id + '","' +
+                              bibinfo['sudoc'] + '","' +
+                              bibinfo['title'].replace('"', '""') + '",' +
+                              bibinfo['year'] + ",Paper\n")
+            else:
+                outfile.write('\n')
 
     idfile.close()
     outfile.close()
