@@ -39,10 +39,11 @@ Running the Code
     * path to the input file (one clean OCLC id per line - blank lines are okay)
     * path to where you want the output CSV file
     
-<br><br>
 1. Run from the command line:
 
    `python metadata_lookup.py`
+   
+***GW Libraries Users***:  See `Deployment Notes / API Credentials / OCLC` for credentials
 
 
 Resources
