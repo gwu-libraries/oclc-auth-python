@@ -3,7 +3,7 @@ GW Libraries fork of OCLC Python Authentication Library
 
 This library is a fork of [https://github.com/OCLC-Developer-Network/oclc-auth-python](https://github.com/OCLC-Developer-Network/oclc-auth-python) which itself is a wrapper around the Web Service Authentication system used by OCLC web services, written for Python. It works with versions 2.7 and 3 (up to 3.6).
 
-This library substitutes a GW-specific use case in place of the OCLC examples.
+This library substitutes a GW-specific use case in place of the OCLC examples.  It calls the [Bibliographic Resource](https://www.oclc.org/developer/develop/web-services/worldcat-metadata-api/bibliographic-resource.en.html) read method from the [Worldcat Metadata API](https://www.oclc.org/developer/develop/web-services/worldcat-metadata-api.en.html), passing it an OCLC number and retrieving the item's MARC data.  From the MARC data, it attempts to extract the item's SUDOC number, title, year, and format.  The results are written to a CSV file.
 
 Installation
 ------------
